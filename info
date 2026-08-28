@@ -1,0 +1,430 @@
+Here is the comprehensive, end-to-end architectural breakdown of the ULTRON system. It details every module, data contract, execution lifecycle, and engineering roadmap.
+
+1. System Architecture & Topology
+The ULTRON architecture separates deterministic compute (rule engines, local databases, OS commands) from stochastic compute (Small/Large Language Models).
+
+By enforcing strict gating and verification layers, the system minimizes local token consumption, avoids API costs, and prevents hallucinations.
+
+                                [ USER INPUT ]
+                                      │
+                                      ▼
+                             ┌─────────────────┐
+                             │  Core 1 Engine  │
+                             │ (Classification)│
+                             └────────┬────────┘
+                                      │
+                                      ▼
+                             ┌─────────────────┐
+                             │  Router Engine  │
+                             └────────┬────────┘
+                                      │
+         ┌────────────────────────────┼────────────────────────────┐
+         │ (Deterministic / Command)  │ (Live Research)            │ (Complex / Coding)
+         ▼                            ▼                            ▼
+┌──────────────────┐        ┌──────────────────┐         ┌──────────────────┐
+│   Pipeline 1     │        │  Pipeline 1.5    │         │   Pipeline 2     │
+│  (Local DB / OS) │        │ (Research Engine)│         │(Deep AI Reasoning│
+└────────┬─────────┘        └────────┬─────────┘         └────────┬─────────┘
+         │ (0ms Bypass)              │ (Draft Output)             │ (Draft Output)
+         │                           ▼                            ▼
+         │                  ┌──────────────────┐         ┌──────────────────┐
+         │                  │  Core 2 Light    │         │  Core 2 Deep     │
+         │                  │  (Verification)  │         │  (Verification)  │
+         │                  └────────┬─────────┘         └────────┬─────────┘
+         │                           │ (If Rejected)              │
+         │                           └────────────► Escalates ────┘
+         │                                                        │
+         ▼                                                        ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                          Ultron Touch Layer                               │
+│                 (Disclaimer Stripping & Final Polish)                     │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      │
+                                      ▼
+                             [ FINAL OUTPUT ]
+2. File-by-File Technical Deep Dive
+Orchestration & Routing Layer
+main.py (Central Runtime Orchestrator)
+Primary Role: Instantiates every subsystem into a persistent runtime graph, provides global exception resilience, and maintains the interactive input loop.  
+PY
+
+Lifecycle:
+
+Executes startup() from voice.voice to signal system boot.  
+PY
+
+Instantiates shared state dependencies (AIEngine, KnowledgeDatabase, Tools, Memory, UltronTouch).  
+PY
+
+Wire-connects pipeline instances (Pipeline1, Pipeline15, Pipeline2) into the Router.  
+PY
+
+Manages the active terminal loop, wrapping turns in a global try/except safety net so runtime faults print diagnostic traces without killing the process.  
+PY
+
+core/core1.py (Pre-Processor & Intent Classifier)
+Primary Role: Performs sub-millisecond lexical normalization and intent routing before any heavy processing begins.  
+PY
+
+Internal Operations:
+
+Sanitization: Strips polite conversational prefixes ("can you please", "could you tell me").
+
+Intent Tagging: Classifies input into greeting, command, general, research, coding, mathematics, or science.
+
+Complexity Scoring: Labels tasks as simple, moderate, or complex.
+
+Response Mode Tagging: Selects output density (short, normal, detailed).
+
+core/router.py (Dynamic Traffic Controller)
+Primary Role: Interprets Core 1's analysis dictionary and dispatches the payload to the appropriate processing pipeline.  
+PY
+
+Routing Logic:
+
+If intent == "command" → Executes immediately via Tools.  
+PY
+
+If complexity == "simple" and no tools are required → Routes to Pipeline 1.  
+PY
++ 1
+
+If complexity == "moderate" → Routes to Pipeline 1.5.  
+PY
+
+If complexity == "complex" → Routes directly to Pipeline 2.  
+PY
+
+If Pipeline 1 misses or Pipeline 1.5 fails Core 2 verification → Dynamically triggers downstream fallback escalation.  
+PY
++ 2
+
+Execution Pipelines
+pipeline/pipeline1.py (The Deterministic Fast Path)
+Primary Role: Sub-10ms lookup against pre-approved knowledge bases and static system facts.  
+PY
+
+Design Contracts:
+
+Directly indexes knowledge/general.json and domain dictionaries into memory.  
+PY
+
+Strips punctuation and executes alias matching across canonical entry IDs.  
+PY
+
+Returns {"verification_required": False} on hit, completely bypassing Core 2 and LLM latency.  
+PY
+
+Returns {"escalate": True} immediately on a database miss.  
+PY
+
+pipeline/pipeline15.py (Live Extractive Research Path)
+Primary Role: Bridges external web/community data with lightweight synthesis.  
+PY
+
+Design Contracts:
+
+Invokes Research.run_search() with multi-source queries (DuckDuckGo, Wikipedia, Reddit).  
+PY
++ 1
+
+Injects active session dialogue from Memory to maintain contextual continuity.  
+PY
+
+Enforces prompt boundaries to prevent hallucinated specifications.  
+PY
+
+Hands the raw draft to Core 2 for light verification.  
+PY
+
+pipeline/pipeline2.py (Deep Reasoning & Specialist Fallback)
+Primary Role: Handles algorithmic programming, multi-step math, deep conceptual explanations, and escalated low-confidence outputs.  
+PY
+
+Design Contracts:
+
+Features its own research instantiation to gather grounding data on escalation.  
+PY
++ 1
+
+Executes deep reasoning prompts via AIEngine.  
+PY
+
+Compulsorily gates output through Core 2 deep verification.  
+PY
+
+Emits auto-corrected responses or graceful fallback notices if confidence remains below threshold.  
+PY
+
+Research, Quality & Verification
+pipeline/research.py (Multi-Source Scraper Engine)
+Primary Role: Gathers live facts from external web layers without requiring dedicated paid API keys.  
+PY
+
+Component Sources:
+
+Wikipedia API: Extracts biographical and conceptual summaries using wikipedia.summary().  
+PY
+
+Reddit Community Scraper: Scrapes discussions, recommendations, and reviews via DuckDuckGo site:reddit.com queries, avoiding Reddit API HTTP 403 blocks.  
+PY
+
+Live Web Scraper: Uses ddgs.text() to extract news and live event data.  
+PY
+
+pipeline/research_quality.py (Relevance Gatekeeper)
+Primary Role: Evaluates the density and relevance of scraped context before handing it to verification layers.  
+PY
+
+Internal Operations:
+
+Strips common stop-words ("what", "is", "explain") to isolate salient keywords.  
+PY
+
+Calculates lexical token set overlap:
+
+Overlap Score= 
+∣Query Keywords∣
+∣Query Keywords∩Answer Keywords∣
+​
+ 
+Applies term-frequency bonuses and returns boolean acceptance flags based on a minimum threshold (0.45).  
+PY
+
+core/core2.py (Verification Gatekeeper)
+Primary Role: Protects against LLM hallucinations and factual drift.  
+PY
++ 1
+
+Internal Operations:
+
+Evaluates synthesized answers against source research context.  
+PY
+
+Generates structured verification payloads containing:
+
+approved: Boolean approval flag.  
+PY
+
+confidence: Float metric (0.0→1.0).  
+PY
+
+issues: Diagnostic string describing detected inaccuracies.  
+PY
+
+improved_answer: Auto-corrected output if minor factual issues are detected.  
+PY
+
+Utility & State Modules
+personality/ultron_touch.py (Post-Processor & Polish)
+Primary Role: Cleans raw LLM outputs before they hit the terminal display or TTS engine.  
+PY
+
+Internal Operations:
+
+Uses regex patterns to strip disclaimers (e.g., "As an AI...", "I am ChatGPT...").
+
+Formats code blocks, trims trailing whitespace, and normalizes stylistic tone.  
+PY
+
+memory/memory.py (Short-Term Context Ledger)
+Primary Role: Maintains rolling multi-turn state across the active terminal session.  
+PY
+
+Internal Operations:
+
+Records {"user": query, "assistant": response} interaction tuples.  
+PY
+
+Compiles multi-turn interaction strings via get_context_string() for prompt injection.  
+PY
++ 1
+
+tools/tools.py (Local OS Execution Interface)
+Primary Role: Interfaces with the host operating system to execute local actions.  
+PY
+
+Supported Operations:
+
+Launches applications (notepad.exe, calc.exe).
+
+System controls (lock_workstation, shutdown_system, take_screenshot).
+
+3. End-to-End Execution Lifecycles
+[Query 1: "whats your name"]
+ └─► Core 1 (Intent: general, Complexity: simple)
+      └─► Pipeline 1 (Local DB Match: 'identity_who_are_you')
+           └─► Output: "I am ULTRON..." (< 10ms, 0 AI tokens)
+
+[Query 2: "open notepad"]
+ └─► Core 1 (Intent: command, Strips: "open")
+      └─► Tools.open_application("notepad")
+           └─► Output: Notepad launched (0 AI tokens)
+
+[Query 3: "who won the latest super bowl"]
+ └─► Core 1 (Intent: research, Complexity: complex)
+      └─► Pipeline 2 (Initiates multi-source scan)
+           ├─► Scrapes DDGS live sports context
+           ├─► LLM generates draft answer
+           ├─► Core 2 catches hallucination, applies auto-correction
+           └─► Ultron Touch -> Final Output
+
+[Query 4: "write a python script to reverse a binary tree"]
+ └─► Core 1 (Intent: coding, Complexity: complex)
+      └─► Pipeline 2 (Specialist coding prompt)
+           ├─► LLM generates recursive algorithm
+           ├─► Core 2 verifies structure (Confidence: 0.95)
+           └─► Ultron Touch -> Clean Markdown Code Block
+4. Engineering Roadmap: Upcoming Milestones
+Milestone	Objective	Key Components / Changes	Expected Impact
+1. Pure Zero-Token Extraction	Eliminate LLM calls for structured web facts.	Refactor pipeline15.py to extract Wikipedia summaries and clean search snippets directly.	Reduces token usage and compute costs to zero on informational queries.
+2. Asymmetric Model Tiering	Split AI engine into dedicated Fast and Heavy tiers.	Assign 1.5B SLM to Core 2 / lightweight summarization; assign 7B–14B LLM to Pipeline 2 reasoning.	Reduces verification latency from ~2s to <300ms.
+3. Hands-Free Voice Stack	Replace terminal input with full-duplex voice.	Integrate real-time Speech-to-Text (faster-whisper / vosk) and streaming Text-to-Speech (edge-tts / pyttsx3).	Full voice assistant capability matching the design blueprint.
+4. Persistent Memory Ledger	Enable cross-session context persistence.	Upgrade memory.py to serialize user facts and preferences to data/user_memory.json.	Retains user context and history across system reboots.
+
+
+
+================================================================================
+                        ULTRON v0.7: SYSTEM DOCUMENTATION
+================================================================================
+
+1. SYSTEM OVERVIEW
+--------------------------------------------------------------------------------
+ULTRON v0.7 is a custom, multi-tier, hybrid local AI assistant architecture. 
+Its primary design philosophy is to minimize hallucination, reduce local compute 
+costs, and answer queries at maximum speed. 
+
+It achieves this by separating deterministic tasks (rule engines, local databases, 
+OS commands) from stochastic compute (Small/Large Language Models). By enforcing 
+strict gating and verification layers, the system avoids unnecessary AI token 
+consumption and prevents inaccurate outputs.
+
+2. SYSTEM ARCHITECTURE & TOPOLOGY
+--------------------------------------------------------------------------------
+[ USER INPUT ]
+      │
+      ▼
+┌─────────────────┐
+│  Core 1 Engine  │ (Classification & Pre-Processing)
+└──────┬──────────┘
+       │
+       ▼
+┌─────────────────┐
+│  Router Engine  │ (Traffic Dispatcher)
+└──────┬──────────┘
+       │
+       ├──────────────────────────────┬──────────────────────────────┐
+       │ (Deterministic)              │ (Live Research)              │ (Complex)
+       ▼                              ▼                              ▼
+┌──────────────────┐          ┌──────────────────┐           ┌──────────────────┐
+│   Pipeline 1     │          │  Pipeline 1.5    │           │   Pipeline 2     │
+│  (Local DB/OS)   │          │ (Research Engine)│           │ (Deep Reasoning) │
+└──────┬───────────┘          └──────┬───────────┘           └──────┬───────────┘
+       │ (0ms Bypass)                │ (Draft Output)               │ (Draft Output)
+       │                             ▼                              ▼
+       │                    ┌──────────────────┐           ┌──────────────────┐
+       │                    │  Core 2 Light    │           │  Core 2 Deep     │
+       │                    │  (Verification)  │           │  (Verification)  │
+       │                    └──────┬───────────┘           └──────┬───────────┘
+       │                           │ (If Rejected)                │
+       │                           └────────────► Escalates ──────┘
+       │                                                          │
+       ▼                                                          ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Ultron Touch Layer                                 │
+│                 (Disclaimer Stripping & Final Polish)                       │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+                               [ FINAL OUTPUT ]
+
+
+3. COMPONENT FILE DEEP DIVE
+--------------------------------------------------------------------------------
+
+A. Orchestration & Routing Layer
+* main.py: The central orchestrator. It initializes all modules, maintains the 
+  interactive terminal loop, and acts as a global safety net to catch runtime 
+  errors without crashing the system.
+* core/core1.py: The pre-processor and intent classifier. It executes sub-millisecond 
+  lexical normalization, strips conversational filler words, identifies user intent 
+  (e.g., command, coding, research), and assigns complexity scores.
+* core/router.py: The traffic dispatcher. It interprets Core 1's analysis and 
+  physically routes the prompt to the correct pipeline or OS tool.
+
+B. Execution Pipelines
+* pipeline/pipeline1.py: The deterministic fast path. Uses zero AI tokens to look 
+  up pre-approved answers from local JSON databases (like general.json) in 
+  under 10 milliseconds, bypassing LLM latency.
+* pipeline/pipeline15.py: The live extractive research path. Built for moderate 
+  complexity, it bridges external web/community data with lightweight AI synthesis 
+  while injecting short-term memory to maintain context.
+* pipeline/pipeline2.py: The deep reasoning layer. Handles algorithms, math, 
+  complex logic, and escalated low-confidence fallbacks. It features its own 
+  research instantiation to ground deep reasoning tasks.
+
+C. Research & Verification
+* pipeline/research.py: The multi-source scraper engine. Gathers live facts 
+  from DuckDuckGo, Wikipedia, and Reddit community discussions without triggering 
+  API blocks or requiring paid keys.
+* pipeline/research_quality.py: The relevance filter. Scores scraped text based 
+  on keyword overlap, ensuring the AI only processes highly relevant data.
+* core/core2.py: The verification gatekeeper. Intercepts AI-generated text to 
+  check for hallucinations against source research context. Generates confidence 
+  scores and applies auto-corrections when minor errors are detected.
+
+D. Utility & State Modules
+* personality/ultron_touch.py: The output sanitizer. Uses regex to strip out 
+  generic AI disclaimers (e.g., "As an AI language model...") for clean presentation.
+* memory/memory.py: The short-term context ledger. Tracks active conversational 
+  history so the system resolves pronouns (like "it" or "they") across multiple turns.
+* tools/tools.py: The OS interface. Allows the system to launch local desktop 
+  applications (like Notepad) and manage system commands (lock, shutdown).
+
+
+4. END-TO-END EXECUTION LIFECYCLES (DATA FLOW)
+--------------------------------------------------------------------------------
+
+* Scenario A: Simple Greeting or Identity
+  Query: "whats your name"
+  Flow: Core 1 (Intent: general, Complexity: simple) -> Pipeline 1 
+  Result: Local DB Match ('identity_who_are_you'). Returns in <10ms (0 AI tokens).
+
+* Scenario B: OS Command
+  Query: "open notepad"
+  Flow: Core 1 (Intent: command) -> router.py -> tools.py
+  Result: Notepad launches on desktop (0 AI tokens).
+
+* Scenario C: Live Informational Research
+  Query: "who won the latest super bowl"
+  Flow: Core 1 (Complexity: moderate) -> Pipeline 1.5 -> research.py 
+  Result: Scrapes live sports context, LLM drafts answer, Core 2 verifies and 
+  potentially auto-corrects hallucinations, Ultron Touch polishes final text.
+
+* Scenario D: Complex Specialist Request
+  Query: "write a python script to reverse a binary tree"
+  Flow: Core 1 (Intent: coding, Complexity: complex) -> Pipeline 2 
+  Result: Research gathers coding context, heavy LLM reasoning models algorithm, 
+  Core 2 deep verification approves logic, Ultron Touch outputs clean code block.
+
+
+5. ENGINEERING ROADMAP (FUTURE MILESTONES)
+--------------------------------------------------------------------------------
+
+* Milestone 1: Pure Zero-Token Extraction
+  Objective: Update Pipeline 1.5 to return clean Wikipedia summaries and high-quality 
+  search snippets directly to the user without invoking an LLM, driving informational 
+  query compute costs to zero.
+
+* Milestone 2: Asymmetric Model Tiering
+  Objective: Split the AI engine. Use a fast, small language model (1.5B) for 
+  lightweight synthesis and Core 2 verification, reserving heavy models (14B-70B) 
+  exclusively for Pipeline 2 deep reasoning.
+
+* Milestone 3: Full Hands-Free Voice Stack
+  Objective: Integrate real-time Speech-to-Text (e.g., Whisper/VOSK) and streaming 
+  Text-to-Speech (e.g., pyttsx3/Edge-TTS) to replace terminal input entirely.
+
+* Milestone 4: Persistent Memory Ledger
+  Objective: Upgrade memory.py to serialize critical user facts and preferences 
+  across system reboots using a persistent data/user_memory.json file.

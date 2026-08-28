@@ -1,0 +1,29 @@
+[
+  {
+    "id": "python",
+    "category": "coding",
+    "aliases": [
+      "what is python",
+      "define python",
+      "what is the python programming language"
+    ],
+    "answers": {
+        "short": "Python is a high-level programming language known for its simple syntax.",
+        "normal": "Python is a high-level programming language known for its simple syntax and wide range of applications.",
+        "detailed": "Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the use of significant indentation."
+    }
+  },
+  {
+    "id": "javascript",
+    "category": "coding",
+    "aliases": [
+      "what is javascript",
+      "define javascript"
+    ],
+    "answers": {
+        "short": "JavaScript is a programming language used to make websites interactive.",
+        "normal": "JavaScript is a programming language commonly used to make websites and web applications interactive.",
+        "detailed": "JavaScript is a high-level, often just-in-time compiled language that conforms to the ECMAScript standard. It is a core technology of the World Wide Web, alongside HTML and CSS."
+    }
+  }
+]

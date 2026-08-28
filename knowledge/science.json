@@ -1,0 +1,49 @@
+[
+    {
+        "id": "gravity",
+        "aliases": [
+            "what is gravity",
+            "define gravity",
+            "explain gravity",
+            "tell me about gravity",
+            "gravity definition"
+        ],
+        "category": "science",
+        "answers": {
+            "short": "Gravity is the force that attracts objects with mass toward one another.",
+            "normal": "Gravity is a fundamental force that causes objects with mass to attract one another.",
+            "detailed": "Gravity is a fundamental interaction associated with mass and energy. Near Earth, it causes objects to accelerate toward the ground and keeps the Moon and artificial satellites in orbit."
+        }
+    },
+    {
+        "id": "physics",
+        "aliases": [
+            "what is physics",
+            "define physics",
+            "physics definition",
+            "explain physics",
+            "tell me about physics"
+        ],
+        "category": "science",
+        "answers": {
+            "short": "Physics is the science that studies matter, energy, motion, and the fundamental forces of nature.",
+            "normal": "Physics is a branch of science that studies matter, energy, motion, forces, space, and time.",
+            "detailed": "Physics is a fundamental science that seeks to understand how matter and energy behave and interact. It includes areas such as mechanics, thermodynamics, electromagnetism, relativity, and quantum physics."
+        }
+    },
+    {
+        "id": "energy",
+        "aliases": [
+            "what is energy",
+            "define energy",
+            "energy definition",
+            "explain energy"
+        ],
+        "category": "science",
+        "answers": {
+            "short": "Energy is the capacity to cause change or do work.",
+            "normal": "Energy is the capacity of a system to do work or cause physical change.",
+            "detailed": "Energy is a physical quantity associated with the ability of a system to perform work or produce change. It appears in forms such as kinetic, potential, thermal, chemical, and electromagnetic energy."
+        }
+    }
+]

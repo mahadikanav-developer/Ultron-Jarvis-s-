@@ -1,0 +1,51 @@
+[
+    {
+        "id": "computer",
+        "aliases": [
+            "what is a computer",
+            "define computer",
+            "computer definition",
+            "what are computers",
+            "explain computer"
+        ],
+        "category": "computing",
+        "answers": {
+            "short": "A computer is an electronic device that processes data according to instructions.",
+            "normal": "A computer is an electronic machine that accepts data, processes it using instructions, stores information, and produces results.",
+            "detailed": "A computer is a programmable electronic system that receives input, processes data according to instructions, stores information, and produces output. Modern computers contain components such as processors, memory, storage, and input/output systems."
+        }
+    },
+    {
+        "id": "cpu",
+        "aliases": [
+            "what is a cpu",
+            "define cpu",
+            "what does cpu mean",
+            "cpu definition",
+            "explain cpu"
+        ],
+        "category": "computing",
+        "answers": {
+            "short": "A CPU is the main processor that executes instructions and performs calculations in a computer.",
+            "normal": "The CPU, or Central Processing Unit, executes program instructions and performs calculations that allow a computer to operate.",
+            "detailed": "The CPU is the central processing component of a computer. It fetches, decodes, and executes instructions while performing arithmetic, logical, control, and data-processing operations."
+        }
+    },
+    {
+        "id": "chrome",
+        "aliases": [
+            "what is chrome",
+            "what is google chrome",
+            "define chrome",
+            "define google chrome",
+            "what does chrome do",
+            "explain chrome"
+        ],
+        "category": "computing",
+        "answers": {
+            "short": "Google Chrome is a web browser developed by Google.",
+            "normal": "Google Chrome is a web browser developed by Google that lets users access and interact with websites and web applications.",
+            "detailed": "Google Chrome is a web browser developed by Google and based on the Chromium project. It is designed to display web pages and run web applications and includes features such as extensions, synchronization, developer tools, and security protections."
+        }
+    }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "percentage",
+    "category": "mathematics",
+    "aliases": [
+      "what is percentage",
+      "define percentage"
+    ],
+    "answers": {
+        "short": "A percentage is a way of expressing a number as a fraction of 100.",
+        "normal": "A percentage is a way of expressing a number as a fraction of 100, often denoted using the percent sign (%).",
+        "detailed": "In mathematics, a percentage is a number or ratio expressed as a fraction of 100. It is often denoted using the percent sign, '%', and is a dimensionless number (pure number) without a unit of measurement."
+    }
+  },
+  {
+    "id": "algebra",
+    "category": "mathematics",
+    "aliases": [
+      "what is algebra",
+      "define algebra"
+    ],
+    "answers": {
+        "short": "Algebra is a branch of mathematics that uses symbols to represent numbers.",
+        "normal": "Algebra is a branch of mathematics that uses symbols and variables to represent numbers and relationships.",
+        "detailed": "Algebra is a broad part of mathematics in which letters and other general symbols are used to represent numbers and quantities in formulae and equations."
+    }
+  }
+]
