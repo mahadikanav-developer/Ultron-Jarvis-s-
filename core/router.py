@@ -15,6 +15,8 @@ class Router:
         self.core2 = core2
 
     def route_request(self, user_input, analysis):
+        if not analysis or not isinstance(analysis, dict):
+            analysis = {}
         route = analysis.get("route", "pipeline2")
         response_mode = analysis.get("response_mode", "normal")
         normalized_input = analysis.get("normalized_input", user_input)

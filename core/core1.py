@@ -278,7 +278,9 @@ class Core1:
     # ================================================================
 
     def normalize(self, text):
-        text = text.lower().strip()
+        if text is None:
+            return ""
+        text = str(text).lower().strip()
         text = text.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
         text = re.sub(r"[^a-z0-9+#./_+\-? ]", " ", text)
         text = re.sub(r"\s+", " ", text)
@@ -293,7 +295,9 @@ class Core1:
         Dynamically detects commands without needing hardcoded lists.
         Strips conversational filler like 'can you', 'please', 'could you'.
         """
-        text = text.lower().strip()
+        if not text:
+            return None
+        text = str(text).lower().strip()
 
         # 1. Strip common conversational filler & polite prefixes
         filler_prefixes = [

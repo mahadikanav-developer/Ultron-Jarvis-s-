@@ -73,6 +73,7 @@ ACCURATE ANSWER:"""
         return {
             "answer": ai_response,
             "source": "pipeline15",
+            "research_type": "synthesis",
             "verification_required": True,
             "escalate": False
         }
